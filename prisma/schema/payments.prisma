@@ -1,20 +1,17 @@
 model Payments {
-    id              String        @id @default(cuid())
+    id              String   @id @default(cuid())
     userId          String
     stripeSessionId String
-    stripePaymentId String        @unique
+    stripePaymentId String   @unique
     amount          Float
     currency        String
     plan            Plan
-    paymentStatus   PaymentStatus @default(PENDING)
-    paidAt          DateTime?
-    createdAt       DateTime      @default(now())
-    updatedAt       DateTime?     @updatedAt
+    createdAt       DateTime @default(now())
 
     user         User           @relation(fields: [userId], references: [id], onDelete: Restrict)
     subscription Subscriptions?
 
     @@index([userId])
-    @@index([paymentStatus])
+    @@index([plan])
     @@map("payments")
 }

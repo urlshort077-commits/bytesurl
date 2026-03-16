@@ -1,8 +1,8 @@
 model Analytics {
     id        String   @id @default(cuid())
     urlsId    String
-    ipAddress String
-    userAgent String
+    ipAddress String?
+    userAgent String?
     referer   String?
     country   String?
     city      String?
@@ -16,5 +16,6 @@ model Analytics {
     @@index([urlsId])
     @@index([clickedAt])
     @@index([country])
+    @@index([device])
     @@map("analytics")
 }

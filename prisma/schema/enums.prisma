@@ -18,16 +18,3 @@ enum UrlStatus {
     AVAILABLE
     RESTRICTED
 }
-
-enum PaymentStatus {
-    PENDING
-    PAID
-    FAILED
-    REFUNDED
-}
-
-enum SubscriptionStatus {
-    ACTIVE
-    CANCELLED
-    EXPIRED
-}

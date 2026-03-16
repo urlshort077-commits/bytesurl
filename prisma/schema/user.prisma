@@ -5,20 +5,17 @@ model User {
     name        String
     avatarUrl   String?
     role        Role       @default(USER)
-    plan        Plan       @default(FREE)
-    urlLimit    Int        @default(10)
-    urlsCreated Int        @default(0)
     status      UserStatus @default(ACTIVE)
     createdAt   DateTime   @default(now())
     updatedAt   DateTime?  @updatedAt
-    deletedAt   DateTime?
 
-    urls          Urls[]
-    payments      Payments[]
-    subscriptions Subscriptions[]
+    urls         Urls[]
+    payments     Payments[]
+    subscription Subscriptions?
 
     @@index([email])
     @@index([firebaseUid])
+    @@index([role])
     @@index([status])
     @@map("users")
 }

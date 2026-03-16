@@ -1,17 +1,16 @@
 model Subscriptions {
-    id          String             @id @default(cuid())
-    userId      String
-    plan        Plan
-    paymentId   String             @unique
-    purchasedAt DateTime           @default(now())
-    expiresAt   DateTime
-    status      SubscriptionStatus @default(ACTIVE)
+    id          String   @id @default(cuid())
+    userId      String   @unique
+    plan        Plan     @default(FREE)
+    paymentId   String?  @unique
+    purchasedAt DateTime @default(now())
+    urlLimit    Int      @default(10)
+    urlsCreated Int      @default(0)
 
-    user    User     @relation(fields: [userId], references: [id], onDelete: Restrict)
-    payment Payments @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+    user    User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+    payment Payments? @relation(fields: [paymentId], references: [id], onDelete: Restrict)
 
     @@index([userId])
-    @@index([status])
-    @@index([expiresAt])
+    @@index([plan])
     @@map("subscriptions")
 }

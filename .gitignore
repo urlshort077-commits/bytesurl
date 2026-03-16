@@ -3,4 +3,5 @@ node_modules
 !.env.example
 dist
 prisma/migration
+prisma/migration*
 /generated/prisma
