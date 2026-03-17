@@ -35,6 +35,9 @@ importers:
       pg:
         specifier: ^8.20.0
         version: 8.20.0
+      stripe:
+        specifier: ^20.4.1
+        version: 20.4.1(@types/node@25.5.0)
       ua-parser-js:
         specifier: ^2.0.9
         version: 2.0.9
@@ -1472,6 +1475,15 @@ packages:
   strip-ansi@6.0.1:
     resolution: {integrity: sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==}
     engines: {node: '>=8'}
+
+  stripe@20.4.1:
+    resolution: {integrity: sha512-axCguHItc8Sxt0HC6aSkdVRPffjYPV7EQqZRb2GkIa8FzWDycE7nHJM19C6xAIynH1Qp1/BHiopSi96jGBxT0w==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      '@types/node': '>=16'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
 
   strnum@2.2.0:
     resolution: {integrity: sha512-Y7Bj8XyJxnPAORMZj/xltsfo55uOiyHcU2tnAVzHUnSJR/KsEX+9RoDeXEnsXtl/CX4fAcrt64gZ13aGaWPeBg==}
@@ -3192,6 +3204,10 @@ snapshots:
     dependencies:
       ansi-regex: 5.0.1
     optional: true
+
+  stripe@20.4.1(@types/node@25.5.0):
+    optionalDependencies:
+      '@types/node': 25.5.0
 
   strnum@2.2.0:
     optional: true

@@ -31,7 +31,7 @@ const recordAnalytics = async (req: Request, urlsId: string) => {
             userAgent: userAgent   || null,
             referer:   Array.isArray(req.headers['referer'])
                         ? req.headers['referer'][0]
-                        : req.headers['referer'] || null,
+                        : req.headers['referer']  || null,
             country:   geo?.country              || null,
             city:      geo?.city                 || null,
             device:    result.device.type        || null,
@@ -45,10 +45,29 @@ const createUrl = async (userId: string, data: {
     originalUrl: string
     customUrl?:  string
 }) => {
-    const subscription = await prisma.subscriptions.findUnique({
+    let subscription = await prisma.subscriptions.findUnique({
         where: { userId }
     })
     if (!subscription) throw new AppError(status.NOT_FOUND, 'Subscription not found')
+
+    if (subscription.plan === 'PRO') {
+        const now       = new Date()
+        const lastReset = new Date(subscription.lastResetAt)
+
+        const monthPassed =
+            now.getMonth()    !== lastReset.getMonth() ||
+            now.getFullYear() !== lastReset.getFullYear()
+
+        if (monthPassed) {
+            subscription = await prisma.subscriptions.update({
+                where: { userId },
+                data: {
+                    urlsCreated: 0,
+                    lastResetAt: now,
+                }
+            })
+        }
+    }
 
     if (subscription.urlsCreated >= subscription.urlLimit) {
         throw new AppError(
