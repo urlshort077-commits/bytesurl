@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-
 import { authService } from './auth.service';
 import status from 'http-status';
 import { sendResponse } from '../../shared/sendResponse';
@@ -25,7 +24,23 @@ const login = catchAsync(async (req: Request, res: Response) => {
     })
 })
 
+const google = catchAsync(async (req: Request, res: Response) => {
+    const result = await authService.googleAuth({
+        firebaseUid: req.firebaseUid,
+        email:       req.body.email,
+        name:        req.body.name,
+        avatarUrl:   req.body.avatarUrl,
+    })
+    sendResponse(res, {
+        httpStatuscode: status.OK,
+        success:    true,
+        message:    'Google auth successful',
+        data:       result,
+    })
+})
+
 export const authController = {
     register,
     login,
+    google,
 }

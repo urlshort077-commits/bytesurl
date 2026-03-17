@@ -3,11 +3,13 @@ import AppError from '../../helpers/AppError';
 import admin from '../../../config/firebase';
 import { envVars } from '../../../config/envVars';
 import status from 'http-status';
+import { Plan, UserStatus } from '../../../../generated/prisma/enums';
 
 const registerUser = async (data: {
-    email:    string
-    password: string
-    name:     string
+    email:     string
+    password:  string
+    name:      string
+    avatarUrl?: string
 }) => {
     let firebaseUser
     try {
@@ -15,6 +17,7 @@ const registerUser = async (data: {
             email:       data.email,
             password:    data.password,
             displayName: data.name,
+            photoURL:    data.avatarUrl,
         })
     } catch (err: any) {
         if (err.code === 'auth/email-already-exists') {
@@ -30,6 +33,7 @@ const registerUser = async (data: {
                 firebaseUid: firebaseUser.uid,
                 email:       data.email,
                 name:        data.name,
+                avatarUrl:   data.avatarUrl ?? null,
             }
         })
     } catch (err) {
@@ -41,7 +45,7 @@ const registerUser = async (data: {
         await prisma.subscriptions.create({
             data: {
                 userId:      user.id,
-                plan:        'FREE',
+                plan:        Plan.FREE,
                 urlLimit:    10,
                 urlsCreated: 0,
             }
@@ -94,7 +98,9 @@ const loginUser = async (data: {
         include: { subscription: true }
     })
     if (!user) throw new AppError(status.NOT_FOUND, 'User not found')
-    if (user.status === 'SUSPENDED') throw new AppError(status.FORBIDDEN, 'Account suspended')
+    if (user.status === UserStatus.SUSPENDED) {
+        throw new AppError(status.FORBIDDEN, 'Account suspended')
+    }
 
     return {
         token: result.idToken,
@@ -102,7 +108,54 @@ const loginUser = async (data: {
     }
 }
 
+const googleAuth = async (data: {
+    firebaseUid: string
+    email:       string
+    name:        string
+    avatarUrl?:  string
+}) => {
+    const existingUser = await prisma.user.findUnique({
+        where:   { firebaseUid: data.firebaseUid },
+        include: { subscription: true }
+    })
+    if (existingUser) return existingUser
+
+    let user
+    try {
+        user = await prisma.user.create({
+            data: {
+                firebaseUid: data.firebaseUid,
+                email:       data.email,
+                name:        data.name,
+                avatarUrl:   data.avatarUrl ?? null,
+            }
+        })
+    } catch (err) {
+        throw new AppError(status.INTERNAL_SERVER_ERROR, 'Google auth failed')
+    }
+
+    try {
+        await prisma.subscriptions.create({
+            data: {
+                userId:      user.id,
+                plan:        Plan.FREE,
+                urlLimit:    10,
+                urlsCreated: 0,
+            }
+        })
+    } catch (err) {
+        await prisma.user.delete({ where: { id: user.id } })
+        throw new AppError(status.INTERNAL_SERVER_ERROR, 'Google auth failed')
+    }
+
+    return prisma.user.findUnique({
+        where:   { id: user.id },
+        include: { subscription: true }
+    })
+}
+
 export const authService = {
     registerUser,
     loginUser,
+    googleAuth,
 }
