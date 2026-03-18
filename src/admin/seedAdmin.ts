@@ -2,6 +2,7 @@ import { Plan, PrismaClient, Role, UserStatus } from "../../generated/prisma/cli
 import { PrismaPg } from "@prisma/adapter-pg"
 import { envVars } from "../config/envVars"
 
+
 const adapter = new PrismaPg({ connectionString: envVars.DATABASE_URL })
 const prisma = new PrismaClient({ adapter })
 

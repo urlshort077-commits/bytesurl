@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { authRoutes } from '../modules/auth/auth.routes.js';
-import { userRoutes } from '../modules/user/user.routes.js';
-import { urlRoutes } from '../modules/urls/urls.routes.js';
-import { adminRoutes } from '../modules/admin/admin.routes.js';
-import { analyticsRoutes } from '../modules/analytics/analytics.routes.js';
+import { authRoutes } from '../modules/auth/auth.routes';
+import { userRoutes } from '../modules/user/user.routes';
+import { urlRoutes } from '../modules/urls/urls.routes';
+import { adminRoutes } from '../modules/admin/admin.routes';
+import { analyticsRoutes } from '../modules/analytics/analytics.routes';
 
 
 const router = Router()
