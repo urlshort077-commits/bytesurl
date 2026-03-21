@@ -24,7 +24,30 @@ const createCheckoutSession = async (userId: string, plan: 'PRO' | 'ULTIMATE') =
 
     const planPrices = getPlanPrices()
     const priceId    = planPrices[plan]
-    if (!priceId) throw new AppError(status.BAD_REQUEST, 'Invalid plan')
+
+    console.log(`[Checkout] Plan: ${plan}`)
+    console.log(`[Checkout] PRO price ID: ${envVars.STRIPE_PRO_PRICE_ID}`)
+    console.log(`[Checkout] ULTIMATE price ID: ${envVars.STRIPE_ULTIMATE_PRICE_ID}`)
+    console.log(`[Checkout] Using price ID: ${priceId}`)
+
+    if (!priceId) throw new AppError(status.BAD_REQUEST, `Price ID not configured for plan: ${plan}`)
+
+    try {
+        const price = await stripe.prices.retrieve(priceId)
+        console.log(`[Checkout] Price type: ${price.type}, recurring: ${JSON.stringify(price.recurring)}`)
+        if (price.type === 'recurring') {
+            throw new AppError(
+                status.BAD_REQUEST,
+                `Price ${priceId} is recurring — must be one-time. Update STRIPE_PRO_PRICE_ID.`
+            )
+        }
+    } catch (err: unknown) {
+        const e = err as { httpStatusCode?: number, message?: string }
+        if (e?.httpStatusCode === 404) {
+            throw new AppError(status.BAD_REQUEST, `Price ID not found in Stripe: ${priceId}`)
+        }
+        throw err
+    }
 
     const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
@@ -86,6 +109,8 @@ const handleWebhook = async (payload: Buffer, signature: string) => {
                 purchasedAt: new Date(),
             }
         })
+
+        console.log(`[Webhook] Plan upgraded to ${plan} for user ${userId}`)
     }
 }
 
