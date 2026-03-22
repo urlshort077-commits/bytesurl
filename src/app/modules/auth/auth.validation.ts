@@ -1,5 +1,11 @@
 import z from 'zod';
 
+const checkEmailValidation = z.object({
+    body: z.object({
+        email: z.email('Invalid email'),
+    })
+})
+
 const registerValidation = z.object({
     body: z.object({
         email:     z.email('Invalid email'),
@@ -25,6 +31,7 @@ const googleAuthValidation = z.object({
 })
 
 export const authValidation = {
+    checkEmailValidation,
     registerValidation,
     loginValidation,
     googleAuthValidation,

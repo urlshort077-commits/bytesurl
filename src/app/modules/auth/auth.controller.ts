@@ -4,6 +4,11 @@ import status from 'http-status';
 import { sendResponse } from '../../shared/sendResponse';
 import { catchAsync } from '../../shared/catchAsync';
 
+const checkEmail = catchAsync(async (req: Request, res: Response) => {
+    await authService.checkEmail(req.body.email)
+    sendResponse(res, { httpStatuscode: status.OK, success: true, message: 'Email found', data: null })
+})
+
 const register = catchAsync(async (req: Request, res: Response) => {
     const result = await authService.registerUser(req.body)
     sendResponse(res, {
@@ -40,6 +45,7 @@ const google = catchAsync(async (req: Request, res: Response) => {
 })
 
 export const authController = {
+    checkEmail,
     register,
     login,
     google,

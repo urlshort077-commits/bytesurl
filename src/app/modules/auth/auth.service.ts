@@ -5,6 +5,12 @@ import { envVars } from '../../../config/envVars';
 import status from 'http-status';
 import { Plan, UserStatus } from '../../../../generated/prisma/enums';
 
+const checkEmail = async (email: string) => {
+    const user = await prisma.user.findUnique({ where: { email } })
+    if (!user) throw new AppError(status.NOT_FOUND, 'No account found with this email')
+    return true
+}
+
 const registerUser = async (data: {
     email:     string
     password:  string
@@ -155,6 +161,7 @@ const googleAuth = async (data: {
 }
 
 export const authService = {
+    checkEmail,
     registerUser,
     loginUser,
     googleAuth,

@@ -7,6 +7,12 @@ import { verifyFirebaseToken } from '../../middlewares/auth.middleware';
 const router = Router()
 
 router.post(
+    '/check-email',
+    validateRequest(authValidation.checkEmailValidation),
+    authController.checkEmail
+)
+
+router.post(
     '/register',
     validateRequest(authValidation.registerValidation),
     authController.register
